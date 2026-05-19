@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 150 30% 12%;
+    --primary: 148 48% 40%;
+    --primary-foreground: 0 0% 100%;
+    --muted: 140 20% 96%;
+    --muted-foreground: 150 10% 45%;
+    --border: 140 20% 90%;
+    --ring: 148 48% 40%;
+    --radius: 0.75rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-forest-900 antialiased;
+  }
+}
+
+.snap-page {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+}
+
+.snap-page > section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .perspective-tree {
+    perspective: 1200px;
+    perspective-origin: 50% 40%;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .glow-line {
+    filter: drop-shadow(0 0 6px rgba(53, 150, 92, 0.6));
+  }
+}
