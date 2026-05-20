@@ -71,7 +71,8 @@ export function LandingPage() {
 
         <section
           data-snap-index={APPOINTMENT_SNAP_INDEX}
-          className="h-screen min-h-screen w-full shrink-0 snap-start snap-always"
+          data-appointment
+          className="min-h-screen w-full shrink-0"
         >
           <AppointmentSection />
         </section>

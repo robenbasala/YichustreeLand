@@ -22,6 +22,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### Admin email (appointments & contact form)
+
+Copy `.env.example` to `.env.local` and set:
+
+- `RESEND_API_KEY` — from [resend.com](https://resend.com)
+- `ADMIN_EMAIL` — where booking and contact notifications are sent
+- `EMAIL_FROM` — verified sender in Resend (use `onboarding@resend.dev` for testing)
+
+Restart `npm run dev` after changing env vars.
+
 ## Tech Stack
 
 - Next.js 15 (App Router)

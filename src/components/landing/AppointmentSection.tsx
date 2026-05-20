@@ -42,7 +42,7 @@ export function AppointmentSection() {
   return (
     <section
       id="appointment"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden px-5 py-20 sm:px-8 lg:px-12"
+      className="relative flex min-h-screen flex-col justify-start px-5 pb-16 pt-28 sm:px-8 sm:pb-20 lg:px-12"
     >
       <div className="pointer-events-none absolute inset-0 bg-radial-green" />
       <FloatingLeaves count={5} className="opacity-40" />

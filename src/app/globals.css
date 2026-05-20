@@ -29,10 +29,16 @@
   scroll-behavior: smooth;
 }
 
-/* Only story chapters snap — post-story sections scroll normally */
-.snap-page > section[data-snap-index] {
+/* Story chapters: full-screen snap */
+.snap-page > section[data-snap-index]:not([data-appointment]) {
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+/* Appointment: tall page — snap to top, then scroll through content */
+.snap-page > section[data-appointment] {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
 }
 
 @layer utilities {

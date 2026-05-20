@@ -10,6 +10,7 @@ import {
   loadAppointment,
   saveAppointment,
 } from "@/lib/client-storage";
+import { notifyAdmin } from "@/lib/notify-admin";
 
 const TIME_SLOTS = [
   "09:00 AM",
@@ -35,6 +36,8 @@ export function AppointmentBooking() {
   const [time, setTime] = useState("");
   const [saved, setSaved] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const existing = loadAppointment();
@@ -48,10 +51,23 @@ export function AppointmentBooking() {
 
   const canSave = Boolean(date && time);
 
-  const handleSave = () => {
-    if (!canSave) return;
-    const ok = saveAppointment({ date, time });
-    if (ok) setSaved(true);
+  const handleSave = async () => {
+    if (!canSave || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      await notifyAdmin({ type: "appointment", date, time });
+      saveAppointment({ date, time });
+      setSaved(true);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not send appointment. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (!loaded) return null;
@@ -126,17 +142,25 @@ export function AppointmentBooking() {
             </div>
           </div>
 
+          {error && (
+            <p className="text-center text-sm font-medium text-red-600">
+              {error}
+            </p>
+          )}
+
           <Button
             size="lg"
             className="w-full shadow-glow"
-            disabled={!canSave || saved}
+            disabled={!canSave || saved || submitting}
             onClick={handleSave}
           >
             {saved ? (
               <>
                 <Check className="h-5 w-5" />
-                Appointment saved
+                Appointment sent
               </>
+            ) : submitting ? (
+              "Sending…"
             ) : (
               "Save appointment"
             )}
@@ -148,7 +172,7 @@ export function AppointmentBooking() {
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-sm font-medium text-brand-700"
             >
-              Saved on this device for {formatDisplayDate(date)} at {time}.
+              We emailed our team. {formatDisplayDate(date)} at {time}.
             </motion.p>
           )}
         </div>

@@ -5,12 +5,15 @@ import { motion } from "framer-motion";
 import { Mail, User, MessageSquare, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { saveContactMessage } from "@/lib/client-storage";
+import { notifyAdmin } from "@/lib/notify-admin";
 
 export function ContactSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSend =
     name.trim().length > 0 &&
@@ -117,17 +120,25 @@ export function ContactSection() {
               />
             </label>
 
+            {error && (
+              <p className="text-center text-sm font-medium text-red-600">
+                {error}
+              </p>
+            )}
+
             <Button
               type="submit"
               size="lg"
               className="w-full shadow-glow"
-              disabled={!canSend || sent}
+              disabled={!canSend || sent || submitting}
             >
               {sent ? (
                 <>
                   <Check className="h-5 w-5" />
-                  Message saved
+                  Message sent
                 </>
+              ) : submitting ? (
+                "Sending…"
               ) : (
                 "Send message"
               )}
@@ -139,7 +150,7 @@ export function ContactSection() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center text-sm font-medium text-brand-700"
               >
-                Your message is saved on this device. We&apos;ll be in touch.
+                We emailed our team — we&apos;ll get back to you soon.
               </motion.p>
             )}
           </div>
