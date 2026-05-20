@@ -3,141 +3,110 @@ export interface SnapChapter {
   label: string;
   title: string;
   subtitle: string;
-  /** Tree snap stage index */
+  showTree: boolean;
   treeStage: number;
-  showEvents: boolean;
-  showEventPhotos: boolean;
-  showReminder: boolean;
-  showAddButton: boolean;
-  showShareBadges: boolean;
+  genScale: Record<number, number>;
+  activeMemberIds?: string[];
+  selectedMemberId?: string;
   treeScale: number;
+  showShareBadges?: boolean;
+  /** Show animated Jewish event cards on the tree */
+  showEvents?: boolean;
+  /** Pan tree right (0–1 = fraction of tree width, e.g. 0.5 = half off-screen) */
+  treePanX?: number;
+  /** Photo gallery attached to this event id */
+  showGalleryForEvent?: string;
+  /** Staged reminder animation (step 6) */
+  reminderAct?: boolean;
+  /** Staged share / connect animation (step 7) */
+  shareAct?: boolean;
 }
 
 export const SNAP_CHAPTERS: SnapChapter[] = [
   {
-    id: "hero",
-    label: "Begin",
-    title: "Preserve Your Family Story for Generations",
+    id: "one-name",
+    label: "Start",
+    title: "Start With One Name",
     subtitle:
-      "Build your Jewish family tree with names in Hebrew and English, sacred milestones, and memories that live on.",
+      "Every family's **yichus** begins with one person. Add the first name and watch your family history start taking shape.",
+    showTree: false,
     treeStage: 0,
-    showEvents: false,
-    showEventPhotos: false,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 1.15,
-  },
-  {
-    id: "root",
-    label: "Ancestor",
-    title: "Every Tree Begins With Roots",
-    subtitle:
-      "Start with your earliest ancestors — the foundation of your family’s story across generations.",
-    treeStage: 0,
-    showEvents: false,
-    showEventPhotos: false,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 1.2,
-  },
-  {
-    id: "build",
-    label: "Branches",
-    title: "Build Your Family Tree",
-    subtitle:
-      "Add parents, children, and spouses. Watch branches extend across a wide, clear lineage view.",
-    treeStage: 2,
-    showEvents: false,
-    showEventPhotos: false,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
+    genScale: {},
     treeScale: 1,
   },
   {
-    id: "members",
-    label: "Family",
-    title: "Add Family Members",
+    id: "grow-tree",
+    label: "Couple",
+    title: "Grow Your Family Tree",
     subtitle:
-      "Rich profiles with photos, Hebrew names, birth dates, and the stories that make each person unique.",
-    treeStage: 3,
-    showEvents: false,
-    showEventPhotos: false,
-    showReminder: false,
-    showAddButton: true,
-    showShareBadges: false,
-    treeScale: 0.95,
-  },
-  {
-    id: "events",
-    label: "Milestones",
-    title: "Jewish Life Events",
-    subtitle:
-      "Brit milah, bar & bat mitzvah, chuppah, aliyah, yahrzeit, and seders — honor the moments that shape your family.",
-    treeStage: 3,
-    showEvents: true,
-    showEventPhotos: false,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 0.92,
-  },
-  {
-    id: "photos",
-    label: "Memories",
-    title: "Photos on Every Milestone",
-    subtitle:
-      "Attach wedding albums, synagogue photos, and family gatherings to the dates your relatives will never forget.",
-    treeStage: 3,
-    showEvents: true,
-    showEventPhotos: true,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 0.9,
-  },
-  {
-    id: "reminders",
-    label: "Reminders",
-    title: "Yahrzeit & Birthday Reminders",
-    subtitle:
-      "Automatic reminders for birthdays, anniversaries, and yahrzeits — keep every generation connected.",
-    treeStage: 3,
-    showEvents: true,
-    showEventPhotos: true,
-    showReminder: true,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 0.9,
+      "Add parents, children, spouses, and relatives. Watch every connection become a living branch in your family tree.",
+    showTree: true,
+    treeStage: 1,
+    genScale: { 0: 1 },
+    treeScale: 1,
   },
   {
     id: "generations",
-    label: "Explore",
-    title: "Explore Generations",
+    label: "Children",
+    title: "Build Generations",
     subtitle:
-      "Zoom out to see your full family spread wide — from great-grandparents to the youngest generation.",
-    treeStage: 7,
+      "Expand your tree across generations and see how every person connects to the bigger family story.",
+    showTree: true,
+    treeStage: 2,
+    genScale: { 0: 0.72, 1: 1 },
+    treeScale: 1,
+  },
+  {
+    id: "life-events",
+    label: "Events",
+    title: "Add Life Events",
+    subtitle:
+      "Attach important moments to each family member — births, weddings, graduations, moves, memorials, and more.",
+    showTree: true,
+    treeStage: 3,
+    genScale: { 0: 0.55, 1: 0.55, 2: 1 },
+    treeScale: 0.95,
     showEvents: true,
-    showEventPhotos: true,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: false,
-    treeScale: 0.78,
+  },
+  {
+    id: "photos",
+    label: "Photos",
+    title: "Preserve Photos & Memories",
+    subtitle:
+      "Upload photos to events and turn simple dates into meaningful memories your family can see and remember.",
+    showTree: true,
+    treeStage: 3,
+    genScale: { 0: 0.55, 1: 0.55, 2: 1 },
+    treeScale: 0.95,
+    showEvents: true,
+    showGalleryForEvent: "ev-avraham",
+  },
+  {
+    id: "reminders",
+    label: "Remind",
+    title: "Send Family Reminders",
+    subtitle:
+      "Automatically send birthday, anniversary, and special-date reminders so important family moments are never forgotten.",
+    showTree: true,
+    treeStage: 3,
+    genScale: { 0: 0.55, 1: 0.55, 2: 1 },
+    treeScale: 0.95,
+    showEvents: true,
+    showGalleryForEvent: "ev-avraham",
+    reminderAct: true,
   },
   {
     id: "share",
-    label: "Together",
-    title: "Share With Family",
+    label: "Share",
+    title: "Share Your Legacy",
     subtitle:
-      "Invite relatives to collaborate privately. Build your legacy together with secure, family-only access.",
-    treeStage: 7,
-    showEvents: true,
-    showEventPhotos: true,
-    showReminder: false,
-    showAddButton: false,
-    showShareBadges: true,
-    treeScale: 0.75,
+      "Invite relatives, share the tree securely, and preserve your family story for future generations.",
+    showTree: true,
+    treeStage: 3,
+    genScale: { 0: 0.55, 1: 0.55, 2: 1 },
+    treeScale: 0.95,
+    treePanX: 0,
+    showEvents: false,
+    shareAct: true,
   },
 ];

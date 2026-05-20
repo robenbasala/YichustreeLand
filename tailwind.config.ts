@@ -10,18 +10,32 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          DEFAULT: "#2eb8b8",
+          50: "#ecfcfc",
+          100: "#cff5f5",
+          200: "#a5ebeb",
+          300: "#6dd9d9",
+          400: "#2eb8b8",
+          500: "#1f9e9e",
+          600: "#1a7f7f",
+          700: "#196666",
+          800: "#195252",
+          900: "#194545",
+          950: "#082929",
+        },
         forest: {
-          50: "#f0f9f4",
-          100: "#dcf2e4",
-          200: "#bce5cc",
-          300: "#8dd1a8",
-          400: "#57b47c",
-          500: "#35965c",
-          600: "#267848",
-          700: "#1f603b",
-          800: "#1b4d31",
-          900: "#173f29",
-          950: "#0b2315",
+          50: "#ecfcfc",
+          100: "#cff5f5",
+          200: "#a5ebeb",
+          300: "#6dd9d9",
+          400: "#2eb8b8",
+          500: "#1f9e9e",
+          600: "#1a7f7f",
+          700: "#196666",
+          800: "#195252",
+          900: "#194545",
+          950: "#082929",
         },
       },
       fontFamily: {
@@ -29,18 +43,18 @@ const config: Config = {
         display: ["var(--font-display)", "Georgia", "serif"],
       },
       boxShadow: {
-        glow: "0 0 40px rgba(53, 150, 92, 0.25)",
-        "glow-lg": "0 0 80px rgba(53, 150, 92, 0.35)",
-        card: "0 4px 24px rgba(15, 60, 35, 0.08)",
-        "card-hover": "0 12px 40px rgba(15, 60, 35, 0.14)",
+        glow: "0 0 40px rgba(46, 184, 184, 0.3)",
+        "glow-lg": "0 0 80px rgba(46, 184, 184, 0.4)",
+        card: "0 4px 24px rgba(8, 41, 41, 0.08)",
+        "card-hover": "0 12px 40px rgba(8, 41, 41, 0.12)",
       },
       backgroundImage: {
         "radial-green":
-          "radial-gradient(ellipse at center, rgba(53, 150, 92, 0.12) 0%, transparent 70%)",
+          "radial-gradient(ellipse at center, rgba(46, 184, 184, 0.14) 0%, transparent 70%)",
         "hero-gradient":
-          "linear-gradient(135deg, rgba(240, 249, 244, 0.9) 0%, rgba(255, 255, 255, 1) 50%, rgba(220, 242, 228, 0.4) 100%)",
+          "linear-gradient(135deg, rgba(236, 252, 252, 0.95) 0%, rgba(255, 255, 255, 1) 50%, rgba(207, 245, 245, 0.5) 100%)",
         "cta-gradient":
-          "linear-gradient(135deg, #1f603b 0%, #35965c 50%, #57b47c 100%)",
+          "linear-gradient(135deg, #196666 0%, #2eb8b8 50%, #6dd9d9 100%)",
       },
       animation: {
         float: "float 6s ease-in-out infinite",

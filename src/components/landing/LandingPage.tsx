@@ -1,75 +1,147 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
-import { TreePine } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { SNAP_CHAPTERS } from "@/lib/snap-chapters";
+import { SiteNavbar } from "./SiteNavbar";
 import { useSnapStage } from "@/hooks/use-snap-stage";
+import { usePhotosAct } from "@/hooks/use-photos-act";
+import { useReminderAct } from "@/hooks/use-reminder-act";
+import { useShareAct } from "@/hooks/use-share-act";
 import { SnapTree } from "./SnapTree";
 import { SnapChapterText } from "./SnapChapterText";
 import { SnapTimeline } from "./SnapTimeline";
-import { CTASection } from "./CTASection";
+import { AppointmentSection } from "./AppointmentSection";
 import { FloatingLeaves } from "./FloatingLeaves";
-import { Button } from "@/components/ui/button";
+
+/** Full-screen snap after story step 7 (share) — appointment calendar */
+export const APPOINTMENT_SNAP_INDEX = SNAP_CHAPTERS.length;
 
 export function LandingPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { activeIndex, chapter } = useSnapStage(scrollRef);
+  const [treeMounted, setTreeMounted] = useState(false);
+
+  useEffect(() => {
+    if (activeIndex >= 1) setTreeMounted(true);
+  }, [activeIndex]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.location.hash !== "#appointment") return;
+    const scrollToAppointment = () => {
+      const section = scrollRef.current?.querySelector(
+        `[data-snap-index="${APPOINTMENT_SNAP_INDEX}"]`,
+      );
+      section?.scrollIntoView({ behavior: "smooth", block: "start" });
+    };
+    requestAnimationFrame(() => requestAnimationFrame(scrollToAppointment));
+  }, []);
+
+  const isHeroLayout = activeIndex === 0;
+  const onStory = activeIndex < SNAP_CHAPTERS.length;
+  const showTree = activeIndex >= 1 && onStory;
+  const showOverlay = onStory;
+  const isPhotos = activeIndex === 4;
+  const isReminders = activeIndex === 5;
+  const isShare = activeIndex === 6;
+  const photosDrive = usePhotosAct(isPhotos && showOverlay);
+  const reminderDrive = useReminderAct(isReminders && showOverlay);
+  const shareDrive = useShareAct(isShare && showOverlay);
 
   return (
-    <main className="relative bg-white">
-      <header className="fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-6 py-4 lg:px-10">
-        <motion.div className="flex items-center gap-2.5 rounded-full border border-forest-100/80 bg-white/80 px-3 py-1.5 shadow-sm backdrop-blur-md">
-          <motion.div className="flex h-9 w-9 items-center justify-center rounded-lg bg-forest-600 text-white">
-            <TreePine className="h-4 w-4" />
-          </motion.div>
-          <span className="font-display text-lg font-semibold text-forest-900">Lineage</span>
-        </motion.div>
-        <Button variant="secondary" size="sm" className="hidden bg-white/80 backdrop-blur-md sm:inline-flex">
-          Sign In
-        </Button>
-      </header>
+    <main id="login" className="relative h-screen overflow-hidden bg-white">
+      <SiteNavbar />
 
-      <SnapTimeline activeIndex={activeIndex} scrollRef={scrollRef} />
+      {onStory && (
+        <SnapTimeline activeIndex={activeIndex} scrollRef={scrollRef} />
+      )}
 
       <div
         ref={scrollRef}
-        className="snap-page relative h-screen snap-y snap-mandatory overflow-y-auto overflow-x-hidden"
+        className="snap-page h-full overflow-y-auto overflow-x-hidden snap-y snap-mandatory"
       >
         {SNAP_CHAPTERS.map((ch, i) => (
           <section
             key={ch.id}
             data-snap-index={i}
             className="h-screen min-h-screen w-full shrink-0 snap-start snap-always"
-            aria-hidden
           />
         ))}
+
+        <section
+          data-snap-index={APPOINTMENT_SNAP_INDEX}
+          className="h-screen min-h-screen w-full shrink-0 snap-start snap-always"
+        >
+          <AppointmentSection />
+        </section>
       </div>
 
-      <div className="pointer-events-none fixed inset-0 z-20 flex flex-col pt-20 pb-8">
-        <div className="flex flex-1 flex-col lg:flex-row lg:items-center lg:gap-4 lg:px-6 xl:px-10">
-          <div className="pointer-events-auto z-30 flex shrink-0 justify-center px-4 lg:w-[36%] lg:justify-start lg:px-0">
-            <SnapChapterText chapter={chapter} isHero={activeIndex === 0} />
-          </div>
+      <AnimatePresence>
+        {showOverlay && (
+          <motion.div
+            key="snap-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+            className="pointer-events-none fixed inset-0 z-20 flex flex-col overflow-hidden pt-[5.25rem] pb-8"
+          >
+            <div
+              className={`flex min-h-0 flex-1 flex-col px-4 lg:px-8 xl:px-12 ${
+                isHeroLayout
+                  ? "items-center justify-center"
+                  : "lg:flex-row lg:items-center lg:gap-10"
+              }`}
+            >
+              <div
+                className={`pointer-events-auto z-30 shrink-0 ${
+                  isHeroLayout
+                    ? "mx-auto w-full max-w-2xl text-center lg:text-left"
+                    : "lg:w-[36%] lg:max-w-md"
+                }`}
+              >
+                <SnapChapterText chapter={chapter} isHero={isHeroLayout} />
+              </div>
 
-          <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-x-auto lg:overflow-visible">
-            <SnapTree chapter={chapter} />
-          </div>
-        </div>
+              {treeMounted && showTree && (
+                <div
+                  className={`pointer-events-auto relative z-10 mt-6 flex min-h-0 min-w-0 flex-1 items-center justify-center lg:mt-0 ${
+                    isPhotos || isReminders || isShare
+                      ? "overflow-visible"
+                      : "overflow-hidden"
+                  }`}
+                >
+                  <SnapTree
+                    chapter={chapter}
+                    photosDrive={isPhotos ? photosDrive : undefined}
+                    reminderDrive={isReminders ? reminderDrive : undefined}
+                    shareDrive={isShare ? shareDrive : undefined}
+                  />
+                </div>
+              )}
+            </div>
 
-        <p className="text-center text-[11px] font-medium text-forest-400">
-          Scroll — step {activeIndex + 1} of {SNAP_CHAPTERS.length}
-        </p>
-      </div>
+            <p className="mt-2 shrink-0 text-center text-[11px] font-medium text-forest-400">
+              {activeIndex === SNAP_CHAPTERS.length - 1 ? (
+                <>
+                  Step {activeIndex + 1} of {SNAP_CHAPTERS.length} — scroll down
+                  to book an appointment
+                </>
+              ) : (
+                <>
+                  Scroll — step {activeIndex + 1} of {SNAP_CHAPTERS.length}
+                </>
+              )}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="relative z-10 bg-white">
-        <CTASection />
-        <footer className="border-t border-forest-100 px-6 py-8 text-center text-sm text-forest-500">
-          <p>© {new Date().getFullYear()} Lineage — Preserve your Jewish family story.</p>
-        </footer>
-      </div>
-
-      <FloatingLeaves count={6} className="pointer-events-none fixed inset-0 z-0 opacity-30" />
+      <FloatingLeaves
+        count={6}
+        className="pointer-events-none fixed inset-0 z-0 opacity-30"
+      />
     </main>
   );
 }

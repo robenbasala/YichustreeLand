@@ -14,9 +14,13 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Lineage — Preserve Your Family Story for Generations",
+  title: "YichusTree — Share Your Family Legacy",
   description:
-    "Build, explore, and share your family tree. Add members, life events, photos, and reminders. A premium genealogy platform for families.",
+    "Start with one name, grow your family tree, add life events, photos, reminders, and share your story for generations.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

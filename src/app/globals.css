@@ -6,7 +6,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 150 30% 12%;
-    --primary: 148 48% 40%;
+    --primary: 180 61% 45%;
     --primary-foreground: 0 0% 100%;
     --muted: 140 20% 96%;
     --muted-foreground: 150 10% 45%;
@@ -29,7 +29,8 @@
   scroll-behavior: smooth;
 }
 
-.snap-page > section {
+/* Only story chapters snap — post-story sections scroll normally */
+.snap-page > section[data-snap-index] {
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
@@ -50,5 +51,44 @@
 
   .glow-line {
     filter: drop-shadow(0 0 6px rgba(53, 150, 92, 0.6));
+  }
+
+  .appointment-glow-ring {
+    background: linear-gradient(
+      135deg,
+      #2eb8b8,
+      #6dd9d9,
+      #a5ebeb,
+      #1f9e9e,
+      #2eb8b8
+    );
+    background-size: 300% 300%;
+    animation: appointment-glow-shift 5s ease infinite;
+  }
+
+  .appointment-glow-pulse {
+    animation: appointment-glow-pulse 3s ease-in-out infinite;
+  }
+}
+
+@keyframes appointment-glow-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes appointment-glow-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.02);
   }
 }

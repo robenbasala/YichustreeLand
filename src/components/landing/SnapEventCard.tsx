@@ -1,79 +1,82 @@
 "use client";
 
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import type { FamilyEvent, TreeMember } from "@/lib/tree-layout";
+import { motion } from "framer-motion";
+import type { TreeEvent } from "@/lib/tree-layout";
 
 interface SnapEventCardProps {
-  event: FamilyEvent;
-  member: TreeMember;
-  visible: boolean;
-  showPhoto: boolean;
-  index: number;
+  event: TreeEvent;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  isNew?: boolean;
+  delay?: number;
+  onSeen?: () => void;
 }
 
 export function SnapEventCard({
   event,
-  member,
-  visible,
-  showPhoto,
-  index,
+  x,
+  y,
+  width,
+  height,
+  isNew = true,
+  delay = 0,
+  onSeen,
 }: SnapEventCardProps) {
-  const Icon = event.icon;
-  const offsetX = (index % 2 === 0 ? -1 : 1) * (110 + index * 20);
-  const offsetY = -70 - index * 50;
+  const glowSoft = `0 0 16px ${event.glow}, 0 0 32px ${event.glow}, 0 4px 14px rgba(15, 23, 42, 0.06)`;
+  const glowStrong = `0 0 28px ${event.glow}, 0 0 52px ${event.glow}, 0 4px 14px rgba(15, 23, 42, 0.08)`;
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.foreignObject
-          key={event.id}
-          x={member.x + offsetX - 70}
-          y={member.y + offsetY - 40}
-          width={140}
-          height={showPhoto && event.photoUrl ? 130 : 72}
-          className="overflow-visible"
-          initial={{ opacity: 0, scale: 0.5, rotate: 8 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          transition={{ type: "spring", stiffness: 200, damping: 20, delay: index * 0.08 }}
+    <foreignObject
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      className="pointer-events-none overflow-visible"
+    >
+      <motion.div
+        initial={isNew ? { opacity: 0, scale: 0.7, y: 12 } : false}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          boxShadow: [glowSoft, glowStrong, glowSoft],
+        }}
+        transition={{
+          opacity: { type: "spring", stiffness: 220, damping: 20, delay },
+          scale: { type: "spring", stiffness: 220, damping: 20, delay },
+          y: { type: "spring", stiffness: 220, damping: 20, delay },
+          boxShadow: { duration: 2.2, repeat: Infinity, ease: "easeInOut" },
+        }}
+        onAnimationComplete={() => {
+          if (isNew) onSeen?.();
+        }}
+        className="flex h-full w-full flex-col justify-center rounded-xl border-2 px-3 py-2.5"
+        style={{
+          borderColor: event.color,
+          backgroundColor: "rgba(255, 255, 255, 0.92)",
+        }}
+      >
+        <p
+          className="text-[11px] font-bold uppercase tracking-[0.2em]"
+          style={{ color: event.color }}
         >
-          <div className="rounded-xl border border-forest-100 bg-white/95 shadow-card backdrop-blur-sm overflow-hidden">
-            {showPhoto && event.photoUrl ? (
-              <>
-                <div className="relative h-16 w-full">
-                  <Image
-                    src={event.photoUrl}
-                    alt={event.title}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div className="p-2">
-                  <p className="text-[10px] font-semibold text-forest-900">{event.title}</p>
-                  <p className="text-[8px] text-forest-500">{event.date}</p>
-                  {event.description ? (
-                    <p className="text-[8px] text-forest-400 mt-0.5 line-clamp-2">
-                      {event.description}
-                    </p>
-                  ) : null}
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center gap-2 p-2">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-forest-50 text-forest-600">
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span>
-                  <p className="text-[10px] font-semibold text-forest-900">{event.title}</p>
-                  <p className="text-[8px] text-forest-500">{event.date}</p>
-                </span>
-              </div>
-            )}
-          </div>
-        </motion.foreignObject>
-      )}
-    </AnimatePresence>
+          Event
+        </p>
+        <p className="mt-1 text-[20px] font-bold leading-tight text-forest-950">
+          {event.title}
+        </p>
+        <p className="mt-1.5 text-[15px] font-semibold text-forest-800">
+          {event.date}
+        </p>
+        <p
+          className="mt-1 text-[13px] font-medium leading-snug"
+          style={{ color: event.color }}
+        >
+          {event.parashah}
+        </p>
+      </motion.div>
+    </foreignObject>
   );
 }

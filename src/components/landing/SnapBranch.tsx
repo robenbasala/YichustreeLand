@@ -7,31 +7,37 @@ interface SnapBranchProps {
   branch: TreeBranch;
   parent: TreeMember;
   child: TreeMember;
-  visible: boolean;
-  index: number;
+  isNew?: boolean;
+  animOrder: number;
 }
 
-export function SnapBranch({ branch, parent, child, visible, index }: SnapBranchProps) {
+export function SnapBranch({
+  branch,
+  parent,
+  child,
+  isNew = false,
+  animOrder,
+}: SnapBranchProps) {
   const pathD = getBranchPath(parent, child, branch.isSpouse);
 
   return (
-    <g>
-      <motion.path
-        d={pathD}
-        fill="none"
-        stroke="url(#branchGradient)"
-        strokeLinecap="round"
-        initial={false}
-        animate={{
-          pathLength: visible ? 1 : 0,
-          opacity: visible ? 1 : 0,
-        }}
-        transition={{
-          pathLength: { duration: 0.9, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] },
-          opacity: { duration: 0.3, delay: index * 0.04 },
-        }}
-        style={{ strokeWidth: 2.5 }}
-      />
-    </g>
+    <motion.path
+      d={pathD}
+      fill="none"
+      stroke="url(#branchGradient)"
+      strokeLinecap="square"
+      strokeLinejoin="miter"
+      strokeWidth={branch.isSpouse ? 2.5 : 2}
+      initial={isNew ? { pathLength: 0, opacity: 0 } : false}
+      animate={{ pathLength: 1, opacity: 1 }}
+      transition={{
+        pathLength: {
+          duration: 0.7,
+          delay: isNew ? animOrder * 0.06 + 0.15 : 0,
+          ease: [0.4, 0, 0.2, 1],
+        },
+        opacity: { duration: 0.25, delay: isNew ? animOrder * 0.05 : 0 },
+      }}
+    />
   );
 }
