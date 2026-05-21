@@ -12,6 +12,7 @@ export function ContactSection() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
+  const [sentTo, setSentTo] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,25 +21,38 @@ export function ContactSection() {
     email.includes("@") &&
     message.trim().length > 0;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!canSend) return;
-    const ok = saveContactMessage({
+    if (!canSend || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    const payload = {
       name: name.trim(),
       email: email.trim(),
       message: message.trim(),
-    });
-    if (ok) {
+    };
+    try {
+      await notifyAdmin({ type: "contact", ...payload });
+      saveContactMessage(payload);
+      setSentTo(payload.email);
       setSent(true);
       setName("");
       setEmail("");
       setMessage("");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Could not send message. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <section className="relative px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-24">
-      <div className="relative mx-auto max-w-xl">
+      <div className="relative mx-auto w-full max-w-2xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -129,7 +143,7 @@ export function ContactSection() {
             <Button
               type="submit"
               size="lg"
-              className="w-full shadow-glow"
+              className="h-14 w-full min-w-full px-10 text-base font-semibold shadow-glow"
               disabled={!canSend || sent || submitting}
             >
               {sent ? (
@@ -150,7 +164,7 @@ export function ContactSection() {
                 animate={{ opacity: 1, y: 0 }}
                 className="text-center text-sm font-medium text-brand-700"
               >
-                We emailed our team — we&apos;ll get back to you soon.
+                Confirmation sent to {sentTo}. We&apos;ll get back to you soon.
               </motion.p>
             )}
           </div>

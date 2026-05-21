@@ -5,20 +5,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"] as const;
 const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
   "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ] as const;
 
 function pad(n: number) {
@@ -85,11 +85,10 @@ export function AppointmentCalendar({ value, onChange }: AppointmentCalendarProp
     });
   };
 
-  const formattedSelected =
+  const shortSelected =
     value &&
     new Date(value + "T12:00:00").toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric",
     });
@@ -97,47 +96,47 @@ export function AppointmentCalendar({ value, onChange }: AppointmentCalendarProp
   return (
     <div
       className={cn(
-        "rounded-2xl border border-brand-200/70 bg-gradient-to-br from-brand-50/80 via-white to-brand-50/40 p-4",
-        "shadow-[inset_0_0_0_1px_rgba(46,184,184,0.1),0_0_32px_rgba(46,184,184,0.14)]",
+        "rounded-xl border border-brand-200/70 bg-gradient-to-br from-brand-50/60 via-white to-brand-50/30 p-2.5",
+        "shadow-[inset_0_0_0_1px_rgba(46,184,184,0.08),0_0_20px_rgba(46,184,184,0.1)]",
       )}
     >
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={prevMonth}
           aria-label="Previous month"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-100 bg-white text-brand-700 transition-all hover:border-brand-300 hover:shadow-[0_0_12px_rgba(46,184,184,0.2)]"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-brand-100 bg-white text-brand-700 transition-all hover:border-brand-300"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-3.5 w-3.5" />
         </button>
-        <p className="font-display text-base font-bold text-forest-950">
+        <p className="font-display text-sm font-bold text-forest-950">
           {MONTHS[view.month]} {view.year}
         </p>
         <button
           type="button"
           onClick={nextMonth}
           aria-label="Next month"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-brand-100 bg-white text-brand-700 transition-all hover:border-brand-300 hover:shadow-[0_0_12px_rgba(46,184,184,0.2)]"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-brand-100 bg-white text-brand-700 transition-all hover:border-brand-300"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-3.5 w-3.5" />
         </button>
       </div>
 
-      <div className="mb-2 grid grid-cols-7 gap-1">
-        {WEEKDAYS.map((d) => (
+      <div className="mb-1 grid grid-cols-7 gap-0.5">
+        {WEEKDAYS.map((d, i) => (
           <span
-            key={d}
-            className="py-1 text-center text-[10px] font-bold uppercase tracking-wider text-brand-600/80"
+            key={`${d}-${i}`}
+            className="py-0.5 text-center text-[9px] font-bold uppercase text-brand-600/75"
           >
             {d}
           </span>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1.5">
+      <div className="grid grid-cols-7 gap-0.5">
         {cells.map((cell) => {
           if (cell.type === "empty") {
-            return <span key={cell.key} className="aspect-square" />;
+            return <span key={cell.key} className="h-8" />;
           }
 
           const isSelected = value === cell.iso;
@@ -152,24 +151,20 @@ export function AppointmentCalendar({ value, onChange }: AppointmentCalendarProp
               disabled={cell.disabled}
               onClick={() => onChange(cell.iso)}
               className={cn(
-                "relative aspect-square rounded-xl text-sm font-semibold transition-all",
+                "relative h-8 rounded-lg text-xs font-semibold transition-all",
                 cell.disabled &&
-                  "cursor-not-allowed text-forest-300/60 line-through decoration-forest-200",
+                  "cursor-not-allowed text-forest-300/50 line-through",
                 !cell.disabled &&
                   !isSelected &&
-                  "text-forest-800 hover:bg-brand-100 hover:shadow-[0_0_14px_rgba(46,184,184,0.2)]",
-                isToday &&
-                  !isSelected &&
-                  !cell.disabled &&
-                  "ring-1 ring-brand-300/60",
-                isSelected &&
-                  "text-white shadow-[0_0_22px_rgba(46,184,184,0.55)] ring-2 ring-brand-400/90",
+                  "text-forest-800 hover:bg-brand-100",
+                isToday && !isSelected && !cell.disabled && "ring-1 ring-brand-300/50",
+                isSelected && "text-white shadow-[0_0_14px_rgba(46,184,184,0.45)]",
               )}
             >
               {isSelected && (
                 <motion.span
                   layoutId="cal-selection"
-                  className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 shadow-[0_0_18px_rgba(46,184,184,0.5)]"
+                  className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-400 to-brand-600"
                   transition={{ type: "spring", stiffness: 380, damping: 32 }}
                 />
               )}
@@ -180,24 +175,20 @@ export function AppointmentCalendar({ value, onChange }: AppointmentCalendarProp
       </div>
 
       <AnimatePresence mode="wait">
-        {formattedSelected ? (
+        {shortSelected ? (
           <motion.p
             key={value}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mt-4 rounded-lg bg-brand-500/10 px-3 py-2 text-center text-xs font-medium text-brand-800"
-          >
-            Selected: {formattedSelected}
-          </motion.p>
-        ) : (
-          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="mt-4 text-center text-xs text-forest-500"
+            exit={{ opacity: 0 }}
+            className="mt-2 rounded-md bg-brand-500/10 px-2 py-1 text-center text-[10px] font-medium text-brand-800"
           >
-            Pick an available date
+            {shortSelected}
           </motion.p>
+        ) : (
+          <p className="mt-2 text-center text-[10px] text-forest-400">
+            Pick a date
+          </p>
         )}
       </AnimatePresence>
     </div>

@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { sendAdminEmail } from "@/lib/send-admin-email";
-
-function escapeHtml(text: string) {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
+import {
+  appointmentAdminHtml,
+  appointmentUserHtml,
+  contactAdminHtml,
+  contactUserHtml,
+} from "@/lib/email-templates";
+import { sendAdminEmail, sendEmail } from "@/lib/send-email";
 
 function formatAppointmentDate(iso: string) {
   return new Date(iso + "T12:00:00").toLocaleDateString("en-US", {
@@ -18,14 +16,28 @@ function formatAppointmentDate(iso: string) {
   });
 }
 
+function normalizePhone(phone: string) {
+  return phone.replace(/\D/g, "");
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const type = body?.type as string;
 
     if (type === "appointment") {
+      const name = String(body.name ?? "").trim();
+      const email = String(body.email ?? "").trim();
+      const phone = String(body.phone ?? "").trim();
       const date = String(body.date ?? "").trim();
       const time = String(body.time ?? "").trim();
+
+      if (!name || !email.includes("@") || normalizePhone(phone).length < 7) {
+        return NextResponse.json(
+          { error: "Name, valid email, and phone are required" },
+          { status: 400 },
+        );
+      }
       if (!date || !time) {
         return NextResponse.json(
           { error: "Date and time are required" },
@@ -33,15 +45,26 @@ export async function POST(request: Request) {
         );
       }
 
+      const details = {
+        name,
+        email,
+        phone,
+        dateFormatted: formatAppointmentDate(date),
+        time,
+      };
+
+      const adminHtml = appointmentAdminHtml(details);
+      const userHtml = appointmentUserHtml(details);
+
       await sendAdminEmail(
-        `New appointment — ${date} ${time}`,
-        `
-          <h2>New YichusTree appointment</h2>
-          <p><strong>Date:</strong> ${escapeHtml(formatAppointmentDate(date))}</p>
-          <p><strong>Time:</strong> ${escapeHtml(time)}</p>
-          <p style="color:#64748b;font-size:12px">Sent from the booking form on yichustree.com</p>
-        `,
+        `New appointment — ${name} · ${date} ${time}`,
+        adminHtml,
       );
+      await sendEmail({
+        to: email,
+        subject: "Your YichusTree appointment is booked",
+        html: userHtml,
+      });
 
       return NextResponse.json({ ok: true });
     }
@@ -60,15 +83,13 @@ export async function POST(request: Request) {
 
       await sendAdminEmail(
         `Contact form — ${name}`,
-        `
-          <h2>New contact message</h2>
-          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-          <p><strong>Email:</strong> <a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></p>
-          <p><strong>Message:</strong></p>
-          <p style="white-space:pre-wrap">${escapeHtml(message)}</p>
-          <p style="color:#64748b;font-size:12px">Reply directly to ${escapeHtml(email)}</p>
-        `,
+        contactAdminHtml(name, email, message),
       );
+      await sendEmail({
+        to: email,
+        subject: "We received your message — YichusTree",
+        html: contactUserHtml(name, email, message),
+      });
 
       return NextResponse.json({ ok: true });
     }

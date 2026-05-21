@@ -4,6 +4,9 @@ export const STORAGE_KEYS = {
 } as const;
 
 export interface SavedAppointment {
+  name: string;
+  email: string;
+  phone: string;
   date: string;
   time: string;
   savedAt: number;
@@ -39,7 +42,7 @@ function writeJson(key: string, value: unknown): boolean {
 
 export function loadAppointment(): SavedAppointment | null {
   const data = readJson<SavedAppointment>(STORAGE_KEYS.appointment);
-  if (!data?.date || !data?.time) return null;
+  if (!data?.date || !data?.time || !data?.name || !data?.email) return null;
   return data;
 }
 
